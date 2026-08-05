@@ -10,6 +10,8 @@ dependencies = [
     "chromadb",
     "rank-bm25",
     "sentence-transformers",
+    "pypdf",
+    "openai",
     "ragas",
     "langfuse",
     "pydantic>=2",
