@@ -52,5 +52,10 @@ def rerank(query: str, chunks: list[dict], top_n: int = 5) -> list[dict]:
     if not chunks:
         return []
     if os.getenv("COHERE_API_KEY"):
-        return _rerank_cohere(query, chunks, top_n)
+        try:
+            import cohere  # noqa: F401
+        except ImportError:
+            pass  # Cohere key set but package not installed -> use local reranker
+        else:
+            return _rerank_cohere(query, chunks, top_n)
     return _rerank_local(query, chunks, top_n)

@@ -58,6 +58,10 @@ def answer(question: str, k: int | None = None) -> dict:
 
     Emits a Langfuse trace and records latency/cost/grounding metrics per request.
     """
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
     from rag.generate.citations import enforce_citations
     from rag.observability.metrics import estimate_cost, record_request
     from rag.observability.tracing import trace

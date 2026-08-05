@@ -63,6 +63,9 @@ def _score(rows: list[dict]) -> dict[str, float]:
 
 
 def main() -> int:
+    from dotenv import load_dotenv
+
+    load_dotenv()
     if not os.getenv("OPENAI_API_KEY"):
         print("OPENAI_API_KEY not set - skipping eval gate (no-op). Set the secret to enable it.")
         return 0
