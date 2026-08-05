@@ -28,6 +28,10 @@ dev = [
 cohere = [
     "cohere",
 ]
+serve = [
+    "fastapi",
+    "uvicorn[standard]",
+]
 
 [build-system]
 requires = ["setuptools>=68"]
