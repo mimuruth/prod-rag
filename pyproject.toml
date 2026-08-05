@@ -4,15 +4,14 @@ version = "0.1.0"
 description = "Production-grade RAG with hybrid retrieval, reranking, citation enforcement, and CI-gated evaluation."
 requires-python = ">=3.11"
 dependencies = [
-    "langchain",
-    "langchain-community",
-    "langgraph",
     "chromadb",
     "rank-bm25",
     "sentence-transformers",
     "pypdf",
     "openai",
-    "ragas",
+    "ragas==0.4.3",
+    "langchain-community<0.4",
+    "langchain-openai<1",
     "datasets",
     "langfuse",
     "pydantic>=2",

@@ -47,12 +47,20 @@ def _build_rows(dataset: list[dict]) -> list[dict]:
 
 def _score(rows: list[dict]) -> dict[str, float]:
     from datasets import Dataset
+    from langchain_openai import ChatOpenAI, OpenAIEmbeddings
     from ragas import evaluate
+    from ragas.embeddings import LangchainEmbeddingsWrapper
+    from ragas.llms import LangchainLLMWrapper
     from ragas.metrics import answer_relevancy, context_precision, faithfulness
+
+    llm = LangchainLLMWrapper(ChatOpenAI(model="gpt-4o-mini", temperature=0))
+    embeddings = LangchainEmbeddingsWrapper(OpenAIEmbeddings(model="text-embedding-3-small"))
 
     result = evaluate(
         Dataset.from_list(rows),
         metrics=[faithfulness, answer_relevancy, context_precision],
+        llm=llm,
+        embeddings=embeddings,
     )
     df = result.to_pandas()
     return {
@@ -81,9 +89,9 @@ def main() -> int:
         if value is None:
             print(f"[skip] {metric}: not scored")
             continue
-        status = "ok" if value >= threshold else "FAIL"
-        print(f"[{status}] {metric}: {value:.3f} (>= {threshold})")
-        if value < threshold:
+        ok = value >= threshold  # nan comparisons are False -> counts as a failure
+        print(f"[{'ok' if ok else 'FAIL'}] {metric}: {value:.3f} (>= {threshold})")
+        if not ok:
             failed.append(metric)
 
     if failed:
