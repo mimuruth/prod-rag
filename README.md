@@ -6,6 +6,7 @@
 ![citation coverage](https://img.shields.io/badge/citation%20coverage-100%25-059669)
 ![p50 latency](https://img.shields.io/badge/p50%20latency-2.3s-f59e0b)
 ![cost per request](https://img.shields.io/badge/cost%2Freq-%240.00025-7c3aed)
+[![textbook](https://img.shields.io/badge/textbook-70--page%20PDF-8a2be2)](https://github.com/mimuruth/ai-portfolio/blob/main/book/ai-engineering-textbook.pdf)
 
 A domain-specific **"Ask My Docs"** system: hybrid retrieval (BM25 + vector),
 cross-encoder reranking, **citation enforcement** (refuses to answer when evidence is
