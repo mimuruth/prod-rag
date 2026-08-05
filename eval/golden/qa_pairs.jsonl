@@ -1,1 +1,6 @@
-{"question": "Example: What is the recommended chunk size for this RAG system?", "ground_truth": "500-800 tokens with ~100 tokens of overlap.", "contexts": []}
+{"question": "What chunk size does this RAG system use?", "ground_truth": "Roughly 500 to 800 tokens per chunk with about 100 tokens of overlap between adjacent chunks."}
+{"question": "Why does the system use overlap between chunks?", "ground_truth": "Overlap preserves context that would otherwise be split across a chunk boundary."}
+{"question": "What embedding model is used in Phase 1 retrieval?", "ground_truth": "The all-MiniLM-L6-v2 sentence-transformers model, run locally."}
+{"question": "What does Phase 2 add on top of vector search?", "ground_truth": "BM25 keyword search fused with the vector results, followed by a cross-encoder reranker."}
+{"question": "What does the generator do when the retrieved context is insufficient?", "ground_truth": "It refuses to answer rather than hallucinate, because it answers strictly from the retrieved context."}
+{"question": "Which vector database backs the retrieval in Phase 1?", "ground_truth": "ChromaDB."}

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 from pathlib import Path
 
 import yaml
@@ -53,37 +54,96 @@ def retrieve(question: str, cfg: dict) -> list[dict]:
 
 
 def answer(question: str, k: int | None = None) -> dict:
-    """Return {'answer', 'citations', 'refused'} grounded in retrieved chunks."""
+    """Return {'answer', 'citations', 'refused'} grounded in retrieved chunks.
+
+    Emits a Langfuse trace and records latency/cost/grounding metrics per request.
+    """
     from rag.generate.citations import enforce_citations
+    from rag.observability.metrics import estimate_cost, record_request
+    from rag.observability.tracing import trace
 
     cfg = _load_config()
     if k is not None:
         cfg["retrieval"]["top_k_vector"] = k
 
-    retrieved = retrieve(question, cfg)
-    if not retrieved:
-        return {"answer": REFUSAL, "citations": [], "refused": True}
+    started = time.perf_counter()
+    with trace("rag.answer", question=question) as span:
+        try:
+            with span.stage("retrieve"):
+                retrieved = retrieve(question, cfg)
 
-    prompt = _load_prompt()
-    context = _format_context(retrieved)
-    messages = [
-        {"role": "system", "content": prompt["system"]},
-        {"role": "user", "content": prompt["user"].format(question=question, context=context)},
-    ]
+            if not retrieved:
+                result = {"answer": REFUSAL, "citations": [], "refused": True}
+                record_request(
+                    {
+                        "latency_ms": (time.perf_counter() - started) * 1000,
+                        "cost_usd": 0.0,
+                        "refused": True,
+                        "grounded": False,
+                        "stages": span.stage_ms,
+                    }
+                )
+                return result
 
-    from openai import OpenAI
+            prompt = _load_prompt()
+            context = _format_context(retrieved)
+            messages = [
+                {"role": "system", "content": prompt["system"]},
+                {"role": "user", "content": prompt["user"].format(question=question, context=context)},
+            ]
 
-    client = OpenAI()
-    resp = client.chat.completions.create(model="gpt-4o-mini", messages=messages, temperature=0)
-    text = (resp.choices[0].message.content or "").strip()
+            from openai import OpenAI
 
-    if REFUSAL.lower() in text.lower():
-        return {"answer": REFUSAL, "citations": [], "refused": True}
+            client = OpenAI()
+            with span.stage("generate"):
+                resp = client.chat.completions.create(
+                    model="gpt-4o-mini", messages=messages, temperature=0
+                )
+            text = (resp.choices[0].message.content or "").strip()
 
-    grounded, citations = enforce_citations(text, retrieved)
-    if not grounded:
-        return {"answer": REFUSAL, "citations": [], "refused": True}
-    return {"answer": text, "citations": citations, "refused": False}
+            usage = getattr(resp, "usage", None)
+            prompt_tokens = getattr(usage, "prompt_tokens", 0) or 0
+            completion_tokens = getattr(usage, "completion_tokens", 0) or 0
+            cost = estimate_cost(prompt_tokens, completion_tokens)
+
+            if REFUSAL.lower() in text.lower():
+                result = {"answer": REFUSAL, "citations": [], "refused": True}
+                grounded = False
+            else:
+                grounded, citations = enforce_citations(text, retrieved)
+                if grounded:
+                    result = {"answer": text, "citations": citations, "refused": False}
+                else:
+                    result = {"answer": REFUSAL, "citations": [], "refused": True}
+
+            latency_ms = (time.perf_counter() - started) * 1000
+            span.update(
+                output=result["answer"],
+                usage={"input": prompt_tokens, "output": completion_tokens},
+                metadata={"cost_usd": cost, "grounded": grounded},
+            )
+            record_request(
+                {
+                    "latency_ms": latency_ms,
+                    "cost_usd": cost,
+                    "prompt_tokens": prompt_tokens,
+                    "completion_tokens": completion_tokens,
+                    "refused": result["refused"],
+                    "grounded": grounded,
+                    "stages": span.stage_ms,
+                }
+            )
+            return result
+        except Exception as exc:  # noqa: BLE001 - record failures for the dashboard
+            record_request(
+                {
+                    "latency_ms": (time.perf_counter() - started) * 1000,
+                    "cost_usd": 0.0,
+                    "error": type(exc).__name__,
+                    "stages": span.stage_ms,
+                }
+            )
+            raise
 
 
 def _main() -> int:

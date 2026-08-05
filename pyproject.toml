@@ -13,6 +13,7 @@ dependencies = [
     "pypdf",
     "openai",
     "ragas",
+    "datasets",
     "langfuse",
     "pydantic>=2",
     "pyyaml",

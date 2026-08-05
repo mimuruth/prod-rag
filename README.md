@@ -44,8 +44,24 @@ flowchart LR
 
 - `v0.1` — top-k vector retrieval + generation (fundamentals) ✅
 - `v0.2` — hybrid retrieval + cross-encoder reranker + citation enforcement + versioned prompts ✅
-- `v0.3` — Ragas offline eval + golden dataset + CI gate
-- `v1.0` — full tracing, cost/latency dashboards, prod regression gating
+- `v0.3` — Ragas offline eval + golden dataset + CI gate ✅
+- `v1.0` — full tracing, cost/latency dashboards, prod regression gating ✅
+
+## Observability & evaluation
+
+- **Tracing** — every request emits a Langfuse trace with per-stage spans (retrieve,
+  generate), token usage, and cost. Set `LANGFUSE_*` in `.env`; tracing no-ops if unset.
+- **Metrics dashboard** — each request is recorded to `.metrics/requests.jsonl`; roll up
+  p50/p90 latency, cost/request, citation coverage, and failure rate:
+
+  ```bash
+  python -m rag.observability.metrics
+  ```
+
+- **CI eval gate** — `eval/run_ragas.py` ingests the corpus, runs the pipeline over the
+  golden dataset, and scores faithfulness / answer relevancy / context precision against
+  the thresholds in `config/retrieval.yaml`. On a PR it **blocks the merge** if any metric
+  regresses (branch protection requires the `eval` check).
 
 ## Stack
 
