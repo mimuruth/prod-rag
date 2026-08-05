@@ -25,6 +25,9 @@ dev = [
     "ruff",
     "mypy",
 ]
+cohere = [
+    "cohere",
+]
 
 [build-system]
 requires = ["setuptools>=68"]

@@ -4,6 +4,7 @@ __pycache__/
 .env
 .chroma/
 chroma_db/
+.bm25/
 *.sqlite3
 .ragas_cache/
 .pytest_cache/

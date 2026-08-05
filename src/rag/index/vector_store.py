@@ -31,10 +31,11 @@ class VectorStore:
             name=collection, embedding_function=self._embed
         )
 
-    def add(self, chunks: list[str], metadatas: list[dict]) -> None:
+    def add(self, chunks: list[str], metadatas: list[dict], ids: list[str] | None = None) -> None:
         if not chunks:
             return
-        ids = [str(uuid.uuid4()) for _ in chunks]
+        if ids is None:
+            ids = [str(uuid.uuid4()) for _ in chunks]
         self._collection.add(documents=chunks, metadatas=metadatas, ids=ids)
 
     def query(self, text: str, k: int = 10) -> list[dict]:

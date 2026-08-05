@@ -42,8 +42,8 @@ flowchart LR
 
 ## Roadmap (tags)
 
-- `v0.1` — top-k vector retrieval + generation (fundamentals)
-- `v0.2` — hybrid retrieval + cross-encoder reranker + citation enforcement + versioned prompts
+- `v0.1` — top-k vector retrieval + generation (fundamentals) ✅
+- `v0.2` — hybrid retrieval + cross-encoder reranker + citation enforcement + versioned prompts ✅
 - `v0.3` — Ragas offline eval + golden dataset + CI gate
 - `v1.0` — full tracing, cost/latency dashboards, prod regression gating
 

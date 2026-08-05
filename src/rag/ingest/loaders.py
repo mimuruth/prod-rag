@@ -65,18 +65,32 @@ def _main() -> None:
     parser.add_argument("--source", required=True, help="Directory to ingest.")
     args = parser.parse_args()
 
+    import uuid
+
+    from rag.index.bm25 import BM25Index
     from rag.index.vector_store import VectorStore
     from rag.ingest.chunker import chunk_text
 
     docs = load_directory(args.source)
-    store = VectorStore()
-    total_chunks = 0
+    all_chunks: list[str] = []
+    all_meta: list[dict] = []
+    all_ids: list[str] = []
     for doc in docs:
-        chunks = chunk_text(doc.text)
-        metadatas = [{**doc.metadata, "chunk": i} for i in range(len(chunks))]
-        store.add(chunks, metadatas)
-        total_chunks += len(chunks)
-    print(f"Ingested {len(docs)} documents -> {total_chunks} chunks into the vector store.")
+        for i, chunk in enumerate(chunk_text(doc.text)):
+            all_chunks.append(chunk)
+            all_meta.append({**doc.metadata, "chunk": i})
+            all_ids.append(str(uuid.uuid4()))
+
+    VectorStore().add(all_chunks, all_meta, all_ids)
+
+    bm25 = BM25Index()
+    bm25.build(all_chunks, all_meta, all_ids)
+    bm25.save()
+
+    print(
+        f"Ingested {len(docs)} documents -> {len(all_chunks)} chunks "
+        f"into the vector store and BM25 index."
+    )
 
 
 if __name__ == "__main__":

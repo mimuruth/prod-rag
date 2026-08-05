@@ -1,6 +1,8 @@
-"""Answer synthesis (Phase 1): retrieve top-k -> build grounded prompt -> generate.
+"""Answer synthesis (Phase 2): hybrid retrieve -> rerank -> generate -> enforce citations.
 
-Phase 2 will insert hybrid retrieval + reranking and stricter citation enforcement.
+Vector + BM25 results are fused with RRF, reranked by a cross-encoder, sent to the
+LLM with a grounding prompt, then the response is checked for valid citations. If it
+is not grounded, the system refuses rather than risk a hallucination.
 """
 
 from __future__ import annotations
@@ -32,15 +34,33 @@ def _format_context(chunks: list[dict]) -> str:
     return "\n\n".join(blocks)
 
 
+def retrieve(question: str, cfg: dict) -> list[dict]:
+    """Hybrid retrieval: vector + BM25 fused by RRF, then cross-encoder rerank."""
+    from rag.index.bm25 import BM25Index
+    from rag.index.vector_store import VectorStore
+    from rag.retrieve.hybrid import reciprocal_rank_fusion
+    from rag.retrieve.rerank import rerank
+
+    rc = cfg["retrieval"]
+    vector_hits = VectorStore().query(question, k=rc["top_k_vector"])
+
+    bm25 = BM25Index.load()
+    bm25_hits = bm25.query(question, k=rc["top_k_bm25"]) if bm25 else []
+
+    result_lists = [vector_hits] + ([bm25_hits] if bm25_hits else [])
+    fused = reciprocal_rank_fusion(result_lists, k=rc["rrf_k"])
+    return rerank(question, fused, top_n=rc["rerank_top_n"])
+
+
 def answer(question: str, k: int | None = None) -> dict:
     """Return {'answer', 'citations', 'refused'} grounded in retrieved chunks."""
-    from rag.index.vector_store import VectorStore
+    from rag.generate.citations import enforce_citations
 
     cfg = _load_config()
-    top_k = k or cfg["retrieval"]["top_k_vector"]
+    if k is not None:
+        cfg["retrieval"]["top_k_vector"] = k
 
-    store = VectorStore()
-    retrieved = store.query(question, k=top_k)
+    retrieved = retrieve(question, cfg)
     if not retrieved:
         return {"answer": REFUSAL, "citations": [], "refused": True}
 
@@ -57,11 +77,13 @@ def answer(question: str, k: int | None = None) -> dict:
     resp = client.chat.completions.create(model="gpt-4o-mini", messages=messages, temperature=0)
     text = (resp.choices[0].message.content or "").strip()
 
-    refused = REFUSAL.lower() in text.lower()
-    citations = [] if refused else [
-        {"id": c["id"], "source": c["metadata"].get("source")} for c in retrieved
-    ]
-    return {"answer": text, "citations": citations, "refused": refused}
+    if REFUSAL.lower() in text.lower():
+        return {"answer": REFUSAL, "citations": [], "refused": True}
+
+    grounded, citations = enforce_citations(text, retrieved)
+    if not grounded:
+        return {"answer": REFUSAL, "citations": [], "refused": True}
+    return {"answer": text, "citations": citations, "refused": False}
 
 
 def _main() -> int:

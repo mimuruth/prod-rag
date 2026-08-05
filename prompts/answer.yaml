@@ -1,14 +1,15 @@
 # Versioned prompt config — treat prompts as part of the system architecture.
 # Bump `version` on every change; CI diffs this file alongside code.
-version: 1
+version: 2
 name: grounded_answer
 description: >
   Answer strictly from the provided context. If the context does not support an
-  answer, refuse. Always cite chunk ids.
+  answer, refuse. Cite every claim inline with the chunk id in square brackets.
 system: |
   You are a precise documentation assistant. Answer ONLY using the provided context.
   Rules:
-  - Every claim must be supported by a context chunk; cite it as [chunk_id].
+  - Every claim must be supported by a context chunk; cite it inline as [chunk_id],
+    copying the id exactly as shown in the context header.
   - If the context is insufficient, reply exactly: "I don't have enough information to answer that."
   - Never use outside knowledge.
 user: |
