@@ -4,3 +4,15 @@
 {"question": "What does Phase 2 add on top of vector search?", "ground_truth": "BM25 keyword search fused with the vector results, followed by a cross-encoder reranker."}
 {"question": "What does the generator do when the retrieved context is insufficient?", "ground_truth": "It refuses to answer rather than hallucinate, because it answers strictly from the retrieved context."}
 {"question": "Which vector database backs the retrieval in Phase 1?", "ground_truth": "ChromaDB."}
+{"question": "What languages does Azure Functions support?", "ground_truth": "C#, Java, JavaScript, PowerShell, Python, and Go, plus custom handlers for languages like Rust."}
+{"question": "Which Azure Functions hosting plan is recommended for new apps?", "ground_truth": "The Flex Consumption plan."}
+{"question": "What does the Azure Functions Premium plan provide?", "ground_truth": "Always-warm instances for the fastest response times, unlimited execution duration, and virtual network integration."}
+{"question": "What is Azure Container Apps?", "ground_truth": "A serverless platform for running containerized applications without managing the underlying infrastructure."}
+{"question": "Can Azure Container Apps scale to zero?", "ground_truth": "Most applications can scale to zero, but applications that scale on CPU or memory load can't scale to zero."}
+{"question": "What can Azure Container Apps autoscale on?", "ground_truth": "HTTP traffic, event-driven processing, CPU or memory load, or any KEDA-supported scaler."}
+{"question": "What container registries can Azure Container Apps run containers from?", "ground_truth": "Any public or private registry, including Docker Hub and Azure Container Registry (ACR)."}
+{"question": "What is Azure Blob Storage optimized for?", "ground_truth": "Storing massive amounts of unstructured data."}
+{"question": "What are the three types of resources in Azure Blob Storage?", "ground_truth": "The storage account, a container, and a blob."}
+{"question": "What are the three types of blobs in Azure Blob Storage?", "ground_truth": "Block blobs, append blobs, and page blobs."}
+{"question": "What are append blobs ideal for?", "ground_truth": "Append operations, such as logging data."}
+{"question": "What are the naming rules for a Blob Storage container?", "ground_truth": "A valid DNS name, 3 to 63 characters, starting with a letter or number, containing only lowercase letters, numbers, and the dash character."}

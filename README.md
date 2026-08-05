@@ -32,18 +32,18 @@ flowchart LR
 
 ## Results scoreboard
 
-Measured by `eval/run_ragas.py` over the golden set (Ragas, gpt-4o-mini judge) on the demo
-corpus. Thresholds are calibrated to this baseline with margin for run-to-run variance and
-enforced by the CI eval gate:
+Measured by `eval/run_ragas.py` over the golden set (Ragas, gpt-4o-mini judge). Corpus: 4 real
+Azure Learn docs (Functions, Container Apps, Blob Storage) + the system doc; 18 golden QA pairs.
+Thresholds are calibrated just below the measured baseline and enforced by the CI eval gate:
 
-| Metric | Hybrid + rerank | Gate threshold |
-|--------|-----------------|----------------|
-| Faithfulness | ~0.75–0.83 | ≥ 0.70 |
-| Answer relevancy | ~0.79 | ≥ 0.70 |
+| Metric | Score | Gate threshold |
+|--------|-------|----------------|
+| Faithfulness | 0.87 | ≥ 0.80 |
+| Answer relevancy | 0.85 | ≥ 0.78 |
 | Context precision | 1.00 | ≥ 0.80 |
 
-> Numbers are on the single-doc demo corpus; they stabilize and rise as the corpus and golden
-> set grow. The point is the **gate is live** — a regression below threshold fails the build.
+> The **gate is live**: a regression below any threshold fails the build. Numbers rise and
+> stabilize further as the corpus and golden set grow.
 
 ## Roadmap (tags)
 
