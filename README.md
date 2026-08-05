@@ -1,5 +1,8 @@
 # prod-rag — Production-Grade RAG with Observability & CI Gating
 
+[![lint-test](https://github.com/mimuruth/prod-rag/actions/workflows/lint-test.yml/badge.svg)](https://github.com/mimuruth/prod-rag/actions/workflows/lint-test.yml)
+[![rag-eval-gate](https://github.com/mimuruth/prod-rag/actions/workflows/eval.yml/badge.svg)](https://github.com/mimuruth/prod-rag/actions/workflows/eval.yml)
+
 A domain-specific **"Ask My Docs"** system: hybrid retrieval (BM25 + vector),
 cross-encoder reranking, **citation enforcement** (refuses to answer when evidence is
 insufficient), a **CI-gated evaluation pipeline**, and full **tracing / cost / latency
