@@ -56,6 +56,18 @@ Thresholds are calibrated just below the measured baseline and enforced by the C
 
 - **Tracing** — every request emits a Langfuse trace with per-stage spans (retrieve,
   generate), token usage, and cost. Set `LANGFUSE_*` in `.env`; tracing no-ops if unset.
+
+  Self-host Langfuse and view traces locally:
+
+  ```bash
+  docker compose -f docker-compose.langfuse.yml up -d      # postgres + clickhouse + redis + minio + langfuse
+  # open http://localhost:3000, create a project, copy the public/secret keys, then in .env:
+  #   LANGFUSE_PUBLIC_KEY=pk-lf-...
+  #   LANGFUSE_SECRET_KEY=sk-lf-...
+  #   LANGFUSE_HOST=http://localhost:3000
+  python -m rag.generate.answer "What is Azure Container Apps?"   # traces now appear in the UI
+  ```
+
 - **Metrics dashboard** — each request is recorded to `.metrics/requests.jsonl`; roll up
   p50/p90 latency, cost/request, citation coverage, and failure rate:
 

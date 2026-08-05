@@ -24,35 +24,37 @@ def _client():
 
 
 class _Trace:
-    """Thin, defensive wrapper over a Langfuse trace (or a no-op)."""
+    """Thin, defensive wrapper over a Langfuse span (or a no-op)."""
 
-    def __init__(self, lf_trace=None) -> None:
-        self._t = lf_trace
+    def __init__(self, client=None, root=None) -> None:
+        self._client = client
+        self._root = root
         self.stage_ms: dict[str, float] = {}
 
     @contextmanager
     def stage(self, name: str):
         start = time.perf_counter()
-        child = None
-        if self._t is not None:
+        cm = None
+        if self._client is not None:
             try:
-                child = self._t.span(name=name)
+                cm = self._client.start_as_current_span(name=name)
+                cm.__enter__()
             except Exception:  # pragma: no cover
-                child = None
+                cm = None
         try:
             yield
         finally:
             self.stage_ms[name] = (time.perf_counter() - start) * 1000
-            if child is not None:
+            if cm is not None:
                 try:
-                    child.end()
+                    cm.__exit__(None, None, None)
                 except Exception:  # pragma: no cover
                     pass
 
     def update(self, **kwargs) -> None:
-        if self._t is not None:
+        if self._root is not None:
             try:
-                self._t.update(**kwargs)
+                self._root.update(**kwargs)
             except Exception:  # pragma: no cover
                 pass
 
@@ -60,18 +62,27 @@ class _Trace:
 @contextmanager
 def trace(name: str, **metadata):
     client = _client()
-    lf_trace = None
-    if client is not None:
-        try:
-            lf_trace = client.trace(name=name, metadata=metadata)
-        except Exception:  # pragma: no cover
-            lf_trace = None
-    handle = _Trace(lf_trace)
+    if client is None:
+        yield _Trace()
+        return
+
+    cm = None
+    root = None
+    try:
+        cm = client.start_as_current_span(name=name, input=metadata)
+        root = cm.__enter__()
+    except Exception:  # pragma: no cover
+        cm = None
+    handle = _Trace(client, root)
     try:
         yield handle
     finally:
-        if client is not None:
+        if cm is not None:
             try:
-                client.flush()
+                cm.__exit__(None, None, None)
             except Exception:  # pragma: no cover
                 pass
+        try:
+            client.flush()
+        except Exception:  # pragma: no cover
+            pass

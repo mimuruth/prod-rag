@@ -123,8 +123,12 @@ def answer(question: str, k: int | None = None) -> dict:
             latency_ms = (time.perf_counter() - started) * 1000
             span.update(
                 output=result["answer"],
-                usage={"input": prompt_tokens, "output": completion_tokens},
-                metadata={"cost_usd": cost, "grounded": grounded},
+                metadata={
+                    "cost_usd": cost,
+                    "grounded": grounded,
+                    "prompt_tokens": prompt_tokens,
+                    "completion_tokens": completion_tokens,
+                },
             )
             record_request(
                 {
