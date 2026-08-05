@@ -108,6 +108,10 @@ The container builds its indexes from `docs/` on first boot, then serves. Provid
 `OPENAI_API_KEY` as a Container Apps secret; add `LANGFUSE_*` to stream traces. Run it
 locally the same way with `make serve` (or `uvicorn api:app --reload`).
 
+Pushing a `vX.Y.Z` tag triggers the `docker` workflow, which builds and publishes the image
+to `ghcr.io/mimuruth/prod-rag` — deploy straight from there with
+`--image ghcr.io/mimuruth/prod-rag:latest` instead of `--source .`.
+
 ## Stack
 
 - **Pipeline:** direct OpenAI (`gpt-4o-mini`) generation over a custom hybrid retriever
