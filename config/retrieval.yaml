@@ -1,0 +1,16 @@
+# Retrieval + gating configuration (versioned alongside code).
+retrieval:
+  top_k_vector: 10
+  top_k_bm25: 10
+  rrf_k: 60
+  rerank_top_n: 5
+
+chunking:
+  size_tokens: 700
+  overlap_tokens: 100
+
+# CI eval gate — build fails if any metric drops below these thresholds.
+eval_thresholds:
+  faithfulness: 0.90
+  answer_relevancy: 0.85
+  context_precision: 0.80

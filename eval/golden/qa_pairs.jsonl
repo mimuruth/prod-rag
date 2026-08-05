@@ -1,0 +1,1 @@
+{"question": "Example: What is the recommended chunk size for this RAG system?", "ground_truth": "500-800 tokens with ~100 tokens of overlap.", "contexts": []}
