@@ -63,6 +63,12 @@ Thresholds are calibrated just below the measured baseline and enforced by the C
   python -m rag.observability.metrics
   ```
 
+  Measured over 8 grounded queries against the Azure-docs corpus:
+
+  | p50 latency | p90 latency | avg cost/request | citation coverage | failure rate |
+  |-------------|-------------|------------------|-------------------|--------------|
+  | 2326 ms | 3709 ms | $0.00025 | 100% | 0% |
+
 - **CI eval gate** — `eval/run_ragas.py` ingests the corpus, runs the pipeline over the
   golden dataset, and scores faithfulness / answer relevancy / context precision against
   the thresholds in `config/retrieval.yaml`. On a PR it **blocks the merge** if any metric
@@ -70,7 +76,7 @@ Thresholds are calibrated just below the measured baseline and enforced by the C
 
 ## Stack
 
-- **Orchestration:** LangChain / LangGraph
+- **Pipeline:** direct OpenAI (`gpt-4o-mini`) generation over a custom hybrid retriever
 - **Vector store:** ChromaDB (swap-able to Weaviate)
 - **Reranking:** Cohere Rerank or open-source cross-encoder (sentence-transformers)
 - **Evaluation:** [Ragas](https://docs.ragas.io/)
