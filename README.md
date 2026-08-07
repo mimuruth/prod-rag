@@ -54,6 +54,8 @@ flowchart LR
 
 ![prod-rag results](docs/prod-rag-results.png)
 
+📎 **Engineering notes:** [scope & success criteria](docs/SCOPING.md) · [decisions, trade-offs & incident log](docs/DECISIONS.md)
+
 Measured by `eval/run_ragas.py` over the golden set (Ragas, gpt-4o-mini judge). Corpus: 4 real
 Azure Learn docs (Functions, Container Apps, Blob Storage) + the system doc; 18 golden QA pairs.
 Thresholds are calibrated just below the measured baseline and enforced by the CI eval gate:
