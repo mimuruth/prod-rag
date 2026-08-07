@@ -21,9 +21,7 @@ observability**.
 > <!-- When recorded, replace the line above with:
 > ▶️ **[90-second walkthrough](PASTE_LOOM_URL_HERE)** — a quick tour of all five portfolio projects. -->
 >
-> 🔗 **Live demo** — _deploy in progress; Azure Container Apps URL coming._
-> <!-- When deployed, replace the line above with:
-> 🔗 **Live demo:** https://<your-app>.<region>.azurecontainerapps.io  ·  `POST /ask` · `GET /healthz` -->
+> 🔗 **Live demo:** https://prod-rag.lemonstone-a5ab9349.eastus.azurecontainerapps.io &nbsp;·&nbsp; `GET /healthz` · `POST /ask` (Azure Container Apps)
 
 ## Architecture
 
