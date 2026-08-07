@@ -17,6 +17,14 @@ observability**.
 > instruments this exact pipeline. The git history/tags show the progression:
 > `v0.2` = production RAG (Project 1), `v1.0` = full observability + regression gating (Project 3).
 
+> ▶️ **90-second walkthrough** — _Loom demo coming soon._
+> <!-- When recorded, replace the line above with:
+> ▶️ **[90-second walkthrough](PASTE_LOOM_URL_HERE)** — a quick tour of all five portfolio projects. -->
+>
+> 🔗 **Live demo** — _deploy in progress; Azure Container Apps URL coming._
+> <!-- When deployed, replace the line above with:
+> 🔗 **Live demo:** https://<your-app>.<region>.azurecontainerapps.io  ·  `POST /ask` · `GET /healthz` -->
+
 ## Architecture
 
 ```mermaid
@@ -96,22 +104,54 @@ Thresholds are calibrated just below the measured baseline and enforced by the C
 ## Deploy to Azure Container Apps
 
 The repo ships a `Dockerfile` and a FastAPI wrapper (`api.py` — `POST /ask` + `GET /healthz`),
-so it is one command away from a live endpoint:
+so it is a few commands from a live endpoint. The container builds its indexes from `docs/`
+on first boot, then serves on `:8000`.
+
+**1. Sign in and pick the subscription**
+
+```bash
+az login
+az account show --query name
+```
+
+**2. Deploy** — cloud-builds the `Dockerfile` (no local Docker needed):
 
 ```bash
 az containerapp up \
   --name prod-rag --resource-group rg-prod-rag --location eastus \
-  --source . --ingress external --target-port 8000 \
-  --env-vars OPENAI_API_KEY=secretref:openai-key
+  --source . --ingress external --target-port 8000
 ```
 
-The container builds its indexes from `docs/` on first boot, then serves. Provide
-`OPENAI_API_KEY` as a Container Apps secret; add `LANGFUSE_*` to stream traces. Run it
-locally the same way with `make serve` (or `uvicorn api:app --reload`).
+`az containerapp up` auto-installs the Container Apps extension and registers providers on first run.
 
-Pushing a `vX.Y.Z` tag triggers the `docker` workflow, which builds and publishes the image
-to `ghcr.io/mimuruth/prod-rag` — deploy straight from there with
-`--image ghcr.io/mimuruth/prod-rag:latest` instead of `--source .`.
+**3. Add `OPENAI_API_KEY` as a secret, then reference it** (keeps the key out of shell history):
+
+```bash
+az containerapp secret set --name prod-rag --resource-group rg-prod-rag \
+  --secrets openai-key=<paste-your-OpenAI-key>
+az containerapp update --name prod-rag --resource-group rg-prod-rag \
+  --set-env-vars OPENAI_API_KEY=secretref:openai-key
+```
+
+Add `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` / `LANGFUSE_HOST` the same way to stream traces.
+
+**4. Get the URL and smoke-test it:**
+
+```bash
+FQDN=$(az containerapp show --name prod-rag --resource-group rg-prod-rag \
+  --query properties.configuration.ingress.fqdn -o tsv)
+curl "https://$FQDN/healthz"
+curl -X POST "https://$FQDN/ask" -H "Content-Type: application/json" \
+  -d '{"question":"What is Azure Container Apps?"}'
+```
+
+The first `/ask` may be slow while indexes build — that's expected. Put the resulting URL in the
+**Live demo** line at the top of this README.
+
+**Deploy from GHCR instead of building** — once the package is public, swap `--source .` for
+`--image ghcr.io/mimuruth/prod-rag:v1.0.0` (pushing a `vX.Y.Z` tag triggers the `docker` workflow
+that publishes to `ghcr.io/mimuruth/prod-rag`). Run it locally the same way with `make serve`
+(or `uvicorn api:app --reload`).
 
 ## Stack
 
