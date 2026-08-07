@@ -23,6 +23,15 @@ observability**.
 >
 > 🔗 **Live demo:** https://prod-rag.lemonstone-a5ab9349.eastus.azurecontainerapps.io &nbsp;·&nbsp; `GET /healthz` · `POST /ask` (Azure Container Apps)
 
+Try the live API:
+
+```bash
+curl -X POST https://prod-rag.lemonstone-a5ab9349.eastus.azurecontainerapps.io/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question":"What is Azure Container Apps?"}'
+# -> {"answer": "...", "citations": [ ... ]}
+```
+
 ## Architecture
 
 ```mermaid
