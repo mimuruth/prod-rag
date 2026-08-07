@@ -16,3 +16,17 @@
 {"question": "What are the three types of blobs in Azure Blob Storage?", "ground_truth": "Block blobs, append blobs, and page blobs."}
 {"question": "What are append blobs ideal for?", "ground_truth": "Append operations, such as logging data."}
 {"question": "What are the naming rules for a Blob Storage container?", "ground_truth": "A valid DNS name, 3 to 63 characters, starting with a letter or number, containing only lowercase letters, numbers, and the dash character."}
+{"question": "What is Azure Functions?", "ground_truth": "A serverless solution that lets you build robust apps with less code, less infrastructure, and lower costs, using cloud infrastructure instead of managing servers."}
+{"question": "What does the Azure Functions Flex Consumption plan provide?", "ground_truth": "Fast event-driven scaling, virtual network integration, and pay-as-you-go billing."}
+{"question": "What does the Azure Functions Dedicated plan offer?", "ground_truth": "Running functions in an existing App Service plan with predictable scaling and costs."}
+{"question": "How can you monitor Azure Functions?", "ground_truth": "With built-in Azure Monitor and Application Insights."}
+{"question": "What are common uses of Azure Container Apps?", "ground_truth": "Deploying API endpoints, hosting background processing jobs, handling event-driven processing, and running microservices."}
+{"question": "How does Azure Container Apps support Blue/Green deployments and A/B testing?", "ground_truth": "By running multiple container revisions and splitting traffic across versions."}
+{"question": "How does Azure Container Apps monitor logs?", "ground_truth": "Using Azure Log Analytics."}
+{"question": "How do you get secure internal-only endpoints in Azure Container Apps?", "ground_truth": "With internal ingress and DNS-based service discovery."}
+{"question": "What is the maximum size of a block blob?", "ground_truth": "Up to about 190.7 TiB."}
+{"question": "What are page blobs used for?", "ground_truth": "Storing random access files up to 8 TiB and serving as disks for Azure virtual machines."}
+{"question": "What does a storage account provide in Blob Storage?", "ground_truth": "A unique namespace in Azure for your data."}
+{"question": "Besides HTTP and HTTPS, how can clients access Blob Storage?", "ground_truth": "Using SFTP, and mounting containers with the NFS 3.0 protocol."}
+{"question": "How does Phase 1 retrieval select which chunks to return?", "ground_truth": "It uses vector similarity search over a ChromaDB collection and returns the top-k chunks."}
+{"question": "What step runs after the BM25 and vector results are fused?", "ground_truth": "A cross-encoder reranker."}

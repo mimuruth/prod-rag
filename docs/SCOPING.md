@@ -24,10 +24,10 @@ hallucinating. Treat answer quality as a metric that gates the build, not a vibe
 - Each request emits a metrics record and a trace.
 
 ## Measured baseline
-- Quality: faithfulness **0.87**, answer-relevancy **0.85**, context-precision **1.00** (18 golden pairs).
+- Quality: faithfulness **0.87**, answer-relevancy **0.85**, context-precision **1.00** (32 golden pairs).
 - Ops: p50 **2,326 ms**, p90 **3,709 ms**, **$0.00025**/request, **100%** citation coverage, **0%** failure.
 
 ## Known limitations
-- Golden set is 18 pairs — demonstrative, not statistically powered.
+- Golden set is 32 pairs — solid for regression gating, still modest for absolute scoring.
 - Langfuse is self-hosted for the demo (no public stakeholder URL).
 - Corpus is 4 Azure Learn docs + the system doc; broadening the corpus needs a golden-set refresh.

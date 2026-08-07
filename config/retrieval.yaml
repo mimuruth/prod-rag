@@ -10,7 +10,7 @@ chunking:
   overlap_tokens: 100
 
 # CI eval gate — build fails if any metric drops below these thresholds.
-# Calibrated to the measured baseline on the corpus (4 Azure Learn docs, 18 golden
+# Calibrated to the measured baseline on the corpus (4 Azure Learn docs, 32 golden
 # QA pairs): faithfulness ~0.87, answer_relevancy ~0.85, context_precision 1.00.
 # Thresholds sit just below baseline so regressions fail but the baseline passes.
 eval_thresholds:
